@@ -59,32 +59,32 @@ function getFrontendData(): Bill {
         timestamp: Date(),
         people: {
             "Grace": {
-                pre_tax_amt: 22,
+                pre_tax_amt: dinero({ amount: 2200, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Sachin": {
-                pre_tax_amt: 15,
+                pre_tax_amt: dinero({ amount: 1500, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Anoush": {
-                pre_tax_amt: 19,
+                pre_tax_amt: dinero({ amount: 1900, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Guadalupe": {
-                pre_tax_amt: 6,
+                pre_tax_amt: dinero({ amount: 600, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Sophia": {
-                pre_tax_amt: 7,
+                pre_tax_amt: dinero({ amount: 700, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             }
         },
-        tax: 5.88,
+        tax: dinero({ amount: 588, currency: USD }),
         tip_type: TipType.PreTaxPct,
         tip_val: 20,
         pre_tax_total: undefined,
@@ -96,17 +96,17 @@ function getFrontendData(): Bill {
         timestamp: Date(),
         people: {
             "Anoush": {
-                pre_tax_amt: 23.43,
+                pre_tax_amt: dinero({ amount: 2343, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Seth": {
-                pre_tax_amt: 45.62,
+                pre_tax_amt: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             }
         },
-        tax: 4.83,
+        tax: dinero({ amount: 483, currency: USD }),
         tip_type: TipType.PreTaxPct,
         tip_val: 20,
         pre_tax_total: undefined,
@@ -118,22 +118,22 @@ function getFrontendData(): Bill {
         timestamp: Date(),
         people: {
             "Anoush": {
-                pre_tax_amt: 23.43,
+                pre_tax_amt: dinero({ amount: 2343, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Dan": {
-                pre_tax_amt: 45.62,
+                pre_tax_amt: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Charlie": {
-                pre_tax_amt: 45.62,
+                pre_tax_amt: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Cash,
                 contribution: undefined
             }
         },
-        tax: 4.83,
+        tax: dinero({ amount: 483, currency: USD }),
         tip_type: TipType.PreTaxPct,
         tip_val: 20,
         pre_tax_total: undefined,
