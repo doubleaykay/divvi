@@ -9,6 +9,7 @@ Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
 const { dinero } = require('dinero.js');
+const { USD } = require('@dinero.js/currencies');
 
 // enum for payment type for a given person
 enum PayType {
