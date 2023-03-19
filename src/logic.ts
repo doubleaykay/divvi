@@ -193,3 +193,7 @@ function saveCurrentBill() {
     retrieveDataFromSession();
     saveDataToLocal();
 }
+
+function testing() {
+    console.log('Hello!!!!')
+}
