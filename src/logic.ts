@@ -12,7 +12,7 @@ Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 type Person = {
     pre_tax_amt: number;
     calc_type: string;
-    contribution: number;
+    contribution: number | undefined;
 }
 
 // data structure for the bill
@@ -27,8 +27,8 @@ type Bill = {
     tax: number;
     tip_type: string;
     tip_val: number;
-    pre_tax_total: number;
-    total: number
+    pre_tax_total: number | undefined;
+    total: number | undefined
 }
 
 function getFrontendData(): Bill {
@@ -46,34 +46,34 @@ function getFrontendData(): Bill {
             "Grace": {
                 pre_tax_amt: 22,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             },
             "Sachin": {
                 pre_tax_amt: 15,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             },
             "Anoush": {
                 pre_tax_amt: 19,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             },
             "Guadalupe": {
                 pre_tax_amt: 6,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             },
             "Sophia": {
                 pre_tax_amt: 7,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             }
         },
         tax: 5.88,
         tip_type: "pre_tax_pct",
         tip_val: 20,
-        pre_tax_total: NaN,
-        total: NaN
+        pre_tax_total: undefined,
+        total: undefined
     }
 
     let dumpling_dinner: Bill = {
@@ -84,19 +84,19 @@ function getFrontendData(): Bill {
             "Anoush": {
                 pre_tax_amt: 23.43,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             },
             "Seth": {
                 pre_tax_amt: 45.62,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             }
         },
         tax: 4.83,
         tip_type: "pre_tax_pct",
         tip_val: 20,
-        pre_tax_total: NaN,
-        total: NaN
+        pre_tax_total: undefined,
+        total: undefined
     }
 
     let squad_at_99: Bill = {
@@ -107,24 +107,24 @@ function getFrontendData(): Bill {
             "Anoush": {
                 pre_tax_amt: 23.43,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             },
             "Dan": {
                 pre_tax_amt: 45.62,
                 calc_type: "exact",
-                contribution: NaN
+                contribution: undefined
             },
             "Charlie": {
                 pre_tax_amt: 45.62,
                 calc_type: "cash",
-                contribution: NaN
+                contribution: undefined
             }
         },
         tax: 4.83,
         tip_type: "pre_tax_pct",
         tip_val: 20,
-        pre_tax_total: NaN,
-        total: NaN
+        pre_tax_total: undefined,
+        total: undefined
     }
 
     return dco_dinner
