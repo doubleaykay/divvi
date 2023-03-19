@@ -126,9 +126,22 @@ function getFrontendData():Bill {
     return dco_dinner
 }
 
-function computeBill() {
+function computeBill(thisBill:Bill):Bill {
     /* compute a bill */
 
+    // 1: compute pre_tax_total using each person's pre_tax_amt
+
+    // 2: compute tip amount using method flag stored in thisBill
+
+    // 3: compute thisBill's total amount
+
+    // 4: determine each person's contribution percentage
+
+    // 5: determine each person's tentative amount
+
+    // 6: adjust each person's amount based on their payment preference
+    
+    return thisBill
 }
 
 function saveDataToSession() {
@@ -161,8 +174,8 @@ function displayResults() {
 function main() {
     /* main logic, triggered when "compute" button pressed */
 
-    getFrontendData();
-    computeBill();
+    computeBill( getFrontendData() );
+
     saveDataToSession();
     retrieveDataFromSession();
     displayResults();
