@@ -15,6 +15,14 @@ type Person = {
     contribution: number | undefined;
 }
 
+// enum for tip calculation method
+enum TipType {
+    PreTaxPct = "PreTaxPct",
+    PostTaxPct = "PostTaxPct",
+    TipDollars = "TipDollars",
+    TotalDollars = "TotalDollars",
+}
+
 // data structure for the bill
 // timestamp format: 'Sun Mar 19 2023 12:04:00 GMT-0400 (Eastern Daylight Time)'
 type Bill = {
@@ -24,7 +32,7 @@ type Bill = {
         [key: string]: Person
     };
     tax: number;
-    tip_type: string;
+    tip_type: TipType;
     tip_val: number;
     pre_tax_total: number | undefined;
     total: number | undefined
@@ -68,7 +76,7 @@ function getFrontendData(): Bill {
             }
         },
         tax: 5.88,
-        tip_type: "pre_tax_pct",
+        tip_type: TipType.PreTaxPct,
         tip_val: 20,
         pre_tax_total: undefined,
         total: undefined
@@ -90,7 +98,7 @@ function getFrontendData(): Bill {
             }
         },
         tax: 4.83,
-        tip_type: "pre_tax_pct",
+        tip_type: TipType.PreTaxPct,
         tip_val: 20,
         pre_tax_total: undefined,
         total: undefined
@@ -117,7 +125,7 @@ function getFrontendData(): Bill {
             }
         },
         tax: 4.83,
-        tip_type: "pre_tax_pct",
+        tip_type: TipType.PreTaxPct,
         tip_val: 20,
         pre_tax_total: undefined,
         total: undefined
