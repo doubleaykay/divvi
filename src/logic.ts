@@ -96,6 +96,33 @@ function getFrontendData():Bill {
         total: NaN
     }
 
+    let squad_at_99:Bill = {
+        isComplete: false,
+        timestamp: Date(),
+        people: {
+            "Anoush": {
+                pre_tax_amt: 23.43,
+                calc_type: "exact",
+                contribution: NaN
+            },
+            "Dan": {
+                pre_tax_amt: 45.62,
+                calc_type: "exact",
+                contribution: NaN
+            },
+            "Charlie": {
+                pre_tax_amt: 45.62,
+                calc_type: "cash",
+                contribution: NaN
+            }
+        },
+        tax: 4.83,
+        tip_type: "pre_tax_pct",
+        tip_val: 20,
+        pre_tax_total: NaN,
+        total: NaN
+    }
+
     return dco_dinner
 }
 
