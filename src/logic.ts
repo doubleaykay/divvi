@@ -145,6 +145,8 @@ function computeBill(thisBill:Bill):Bill {
 
     // 6: adjust each person's amount based on their payment preference
 
+    // 7: mark bill as complete (i.e. has all information)
+
     return thisBill
 }
 
