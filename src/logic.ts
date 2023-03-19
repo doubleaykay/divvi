@@ -8,6 +8,12 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
+// enum for payment type for a given person
+enum PayType {
+    Cash = "Cash",
+    Exact = "Exact",
+}
+
 // data structure for a person
 type Person = {
     pre_tax_amt: number;
@@ -15,10 +21,12 @@ type Person = {
     contribution: number | undefined;
 }
 
-// enum for payment type for a given person
-enum PayType {
-    Cash = "Cash",
-    Exact = "Exact",
+// enum for tip calculation method for a given bill
+enum TipType {
+    PreTaxPct = "PreTaxPct",
+    PostTaxPct = "PostTaxPct",
+    TipDollars = "TipDollars",
+    TotalDollars = "TotalDollars",
 }
 
 // data structure for the bill
@@ -34,14 +42,6 @@ type Bill = {
     tip_val: number;
     pre_tax_total: number | undefined;
     total: number | undefined
-}
-
-// enum for tip calculation method for a given bill
-enum TipType {
-    PreTaxPct = "PreTaxPct",
-    PostTaxPct = "PostTaxPct",
-    TipDollars = "TipDollars",
-    TotalDollars = "TotalDollars",
 }
 
 function getFrontendData(): Bill {
