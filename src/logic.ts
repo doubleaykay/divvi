@@ -19,7 +19,6 @@ type Person = {
 // timestamp format: 'Sun Mar 19 2023 12:04:00 GMT-0400 (Eastern Daylight Time)'
 type Bill = {
     id: string;
-    isComplete: boolean;
     timestamp: string;
     people: {
         [key: string]: Person
@@ -40,7 +39,6 @@ function getFrontendData(): Bill {
 
     let dco_dinner: Bill = {
         id: "null",
-        isComplete: false,
         timestamp: Date(),
         people: {
             "Grace": {
@@ -78,7 +76,6 @@ function getFrontendData(): Bill {
 
     let dumpling_dinner: Bill = {
         id: "null",
-        isComplete: false,
         timestamp: Date(),
         people: {
             "Anoush": {
@@ -101,7 +98,6 @@ function getFrontendData(): Bill {
 
     let squad_at_99: Bill = {
         id: "null",
-        isComplete: false,
         timestamp: Date(),
         people: {
             "Anoush": {
