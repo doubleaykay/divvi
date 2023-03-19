@@ -8,7 +8,7 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
-const { dinero } = require('dinero.js');
+const { dinero, add, toDecimal } = require('dinero.js');
 const { USD } = require('@dinero.js/currencies');
 
 // enum for payment type for a given person
@@ -162,6 +162,9 @@ function computeBill(thisBill: Bill): Bill {
     /* alternative proposed strategy to compute a bill */
 
     // 1: compute pre_tax_total using each person's pre_tax_amt
+    thisBill.pre_tax_total = Object.values(thisBill.people).reduce((accumulator, currentValue) => {
+        return add(accumulator, currentValue.pre_tax_amt)
+    }, dinero({ amount: 0, currency: USD }))
 
     // 2: compute tip amount using method flag stored in thisBill
 
@@ -174,6 +177,8 @@ function computeBill(thisBill: Bill): Bill {
     // 6: Recompute remaining balance and each exact person's contribution percentage to that balance
 
     // 7: determine each exact person's amount
+
+    console.log(toDecimal(thisBill.pre_tax_total))
 
     return thisBill
 }
@@ -226,4 +231,4 @@ function testing() {
     console.log('Hello!!!!')
 }
 
-console.log(getFrontendData())
+console.log(computeBill(getFrontendData()))
