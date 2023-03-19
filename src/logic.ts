@@ -141,7 +141,7 @@ function getFrontendData(): Bill {
 }
 
 function computeBill(thisBill: Bill): Bill {
-    /* compute a bill */
+    /* proposed strategy to compute a bill */
 
     // 1: compute pre_tax_total using each person's pre_tax_amt
 
@@ -155,7 +155,22 @@ function computeBill(thisBill: Bill): Bill {
 
     // 6: adjust each person's amount based on their payment preference
 
-    // 7: mark bill as complete (i.e. has all information)
+
+    /* alternative proposed strategy to compute a bill */
+
+    // 1: compute pre_tax_total using each person's pre_tax_amt
+
+    // 2: compute tip amount using method flag stored in thisBill
+
+    // 3: compute thisBill's total amount
+
+    // 4: determine each person's ideal contribution percentage
+
+    // 5: determine rounded contribution for each cash person
+
+    // 6: Recompute remaining balance and each exact person's contribution percentage to that balance
+
+    // 7: determine each exact person's amount
 
     return thisBill
 }
