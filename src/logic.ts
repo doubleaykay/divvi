@@ -4,23 +4,21 @@ Main logic for Divvi.
 Contains functions to get and process user input, compute a bill,
 and store results.
 
-Written by Anoush Khan, March 2023
+Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
 // data structure for a person
 type Person = {
     pre_tax_amt: number;
-    calc_type: string;
+    pay_type: PayType;
     contribution: number | undefined;
 }
 
-// enum for tip calculation method
-enum TipType {
-    PreTaxPct = "PreTaxPct",
-    PostTaxPct = "PostTaxPct",
-    TipDollars = "TipDollars",
-    TotalDollars = "TotalDollars",
+// enum for payment type for a given person
+enum PayType {
+    Cash = "Cash",
+    Exact = "Exact",
 }
 
 // data structure for the bill
@@ -38,6 +36,14 @@ type Bill = {
     total: number | undefined
 }
 
+// enum for tip calculation method for a given bill
+enum TipType {
+    PreTaxPct = "PreTaxPct",
+    PostTaxPct = "PostTaxPct",
+    TipDollars = "TipDollars",
+    TotalDollars = "TotalDollars",
+}
+
 function getFrontendData(): Bill {
     /* grab data from frontend and store it in the standard internal
     data format */
@@ -51,27 +57,27 @@ function getFrontendData(): Bill {
         people: {
             "Grace": {
                 pre_tax_amt: 22,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Sachin": {
                 pre_tax_amt: 15,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Anoush": {
                 pre_tax_amt: 19,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Guadalupe": {
                 pre_tax_amt: 6,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Sophia": {
                 pre_tax_amt: 7,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             }
         },
@@ -88,12 +94,12 @@ function getFrontendData(): Bill {
         people: {
             "Anoush": {
                 pre_tax_amt: 23.43,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Seth": {
                 pre_tax_amt: 45.62,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             }
         },
@@ -110,17 +116,17 @@ function getFrontendData(): Bill {
         people: {
             "Anoush": {
                 pre_tax_amt: 23.43,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Dan": {
                 pre_tax_amt: 45.62,
-                calc_type: "exact",
+                pay_type: PayType.Exact,
                 contribution: undefined
             },
             "Charlie": {
                 pre_tax_amt: 45.62,
-                calc_type: "cash",
+                pay_type: PayType.Cash,
                 contribution: undefined
             }
         },
