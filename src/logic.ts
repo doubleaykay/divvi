@@ -18,6 +18,7 @@ type Person = {
 // data structure for the bill
 // timestamp format: 'Sun Mar 19 2023 12:04:00 GMT-0400 (Eastern Daylight Time)'
 type Bill = {
+    id: string;
     isComplete: boolean;
     timestamp: string;
     people: {
@@ -38,6 +39,7 @@ function getFrontendData():Bill {
     // RETURN DEMO BILL IN THE MEANTIME
 
     let dco_dinner:Bill = {
+        id: "null",
         isComplete: false,
         timestamp: Date(),
         people: {
@@ -75,6 +77,7 @@ function getFrontendData():Bill {
     }
 
     let dumpling_dinner:Bill = {
+        id: "null",
         isComplete: false,
         timestamp: Date(),
         people: {
@@ -97,6 +100,7 @@ function getFrontendData():Bill {
     }
 
     let squad_at_99:Bill = {
+        id: "null",
         isComplete: false,
         timestamp: Date(),
         people: {
@@ -140,7 +144,7 @@ function computeBill(thisBill:Bill):Bill {
     // 5: determine each person's tentative amount
 
     // 6: adjust each person's amount based on their payment preference
-    
+
     return thisBill
 }
 
