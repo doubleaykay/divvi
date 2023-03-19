@@ -162,7 +162,7 @@ function computeBill(thisBill: Bill): Bill {
     /* alternative proposed strategy to compute a bill */
 
     // 1: compute pre_tax_total using each person's pre_tax_amt
-    thisBill.pre_tax_total = Object.values(thisBill.people).reduce((accumulator, currentValue) => {
+    thisBill.pre_tax_total = Object.values(thisBill.people).reduce((accumulator, currentValue): number => {
         return add(accumulator, currentValue.pre_tax_amt)
     }, dinero({ amount: 0, currency: USD }))
 
