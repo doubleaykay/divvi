@@ -15,5 +15,9 @@
     "typescript": "^5.0.2",
     "webpack": "^5.76.2",
     "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "@dinero.js/currencies": "^2.0.0-alpha.14",
+    "dinero.js": "^2.0.0-alpha.14"
   }
 }
