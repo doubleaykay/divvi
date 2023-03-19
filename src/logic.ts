@@ -31,14 +31,14 @@ type Bill = {
     total: number
 }
 
-function getFrontendData():Bill {
+function getFrontendData(): Bill {
     /* grab data from frontend and store it in the standard internal
     data format */
 
     // PLACEHOLDER FOR CODE TO GRAB DATA FROM FRONTEND
     // RETURN DEMO BILL IN THE MEANTIME
 
-    let dco_dinner:Bill = {
+    let dco_dinner: Bill = {
         id: "null",
         isComplete: false,
         timestamp: Date(),
@@ -76,7 +76,7 @@ function getFrontendData():Bill {
         total: NaN
     }
 
-    let dumpling_dinner:Bill = {
+    let dumpling_dinner: Bill = {
         id: "null",
         isComplete: false,
         timestamp: Date(),
@@ -99,7 +99,7 @@ function getFrontendData():Bill {
         total: NaN
     }
 
-    let squad_at_99:Bill = {
+    let squad_at_99: Bill = {
         id: "null",
         isComplete: false,
         timestamp: Date(),
@@ -130,7 +130,7 @@ function getFrontendData():Bill {
     return dco_dinner
 }
 
-function computeBill(thisBill:Bill):Bill {
+function computeBill(thisBill: Bill): Bill {
     /* compute a bill */
 
     // 1: compute pre_tax_total using each person's pre_tax_amt
@@ -180,7 +180,7 @@ function displayResults() {
 function main() {
     /* main logic, triggered when "compute" button pressed */
 
-    computeBill( getFrontendData() );
+    computeBill(getFrontendData());
 
     saveDataToSession();
     retrieveDataFromSession();
