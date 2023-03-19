@@ -8,6 +8,8 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
+const { dinero } = require('dinero.js');
+
 // enum for payment type for a given person
 enum PayType {
     Cash = "Cash",
