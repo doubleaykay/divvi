@@ -197,3 +197,5 @@ function saveCurrentBill() {
 function testing() {
     console.log('Hello!!!!')
 }
+
+console.log(getFrontendData())
