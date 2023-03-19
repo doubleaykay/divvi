@@ -167,6 +167,27 @@ function computeBill(thisBill: Bill): Bill {
     }, dinero({ amount: 0, currency: USD }))
 
     // 2: compute tip amount using method flag stored in thisBill
+    switch(thisBill.tip_type) {
+        case TipType.PreTaxPct: {
+            // statements;
+            break;
+        }
+        case TipType.PostTaxPct: {
+            // statements;
+            break;
+        }
+        case TipType.TipDollars: {
+            // statements;
+            break;
+        }
+        case TipType.TotalDollars: {
+            // statements;
+            break;
+        }
+        default: {
+            throw new Error("Tip type stored in bill does not match enum val");
+        }
+    }
 
     // 3: compute thisBill's total amount
 
