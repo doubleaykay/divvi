@@ -8,7 +8,7 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
-const { dinero, add, toDecimal } = require('dinero.js');
+const { dinero, add, multiply, toDecimal } = require('dinero.js');
 const { USD } = require('@dinero.js/currencies');
 
 // enum for payment type for a given person
@@ -53,6 +53,10 @@ function getFrontendData(): Bill {
 
     // PLACEHOLDER FOR CODE TO GRAB DATA FROM FRONTEND
     // RETURN DEMO BILL IN THE MEANTIME
+
+    // there should be a constraint on the tip field based on the tip type:
+    // if pre or post tax percent, can only enter whole numbers
+    // if tip dollars or total dollars, then can only enter currency
 
     let dco_dinner: Bill = {
         id: "null",
@@ -143,6 +147,11 @@ function getFrontendData(): Bill {
     return dco_dinner
 }
 
+function convertPctToScale(pct: number): number {
+    // TODO this assumes that the input is a whole number representing percent
+    return dinero({ amount: pct, scale: 2 })
+}
+
 function computeBill(thisBill: Bill): Bill {
     /* proposed strategy to compute a bill */
 
@@ -167,21 +176,25 @@ function computeBill(thisBill: Bill): Bill {
     }, dinero({ amount: 0, currency: USD }))
 
     // 2: compute tip amount using method flag stored in thisBill
+    // use Bill.tip_type, Bill.tip_val, and Bill.pre_tax_total to compute Bill.total
     switch(thisBill.tip_type) {
         case TipType.PreTaxPct: {
-            // statements;
+            let tip_amt: number = multiply(thisBill.pre_tax_total, convertPctToScale(thisBill.tip_val))
             break;
         }
         case TipType.PostTaxPct: {
             // statements;
+            throw new Error("Post Tax Percent tip logic has not been implemented yet.");
             break;
         }
         case TipType.TipDollars: {
             // statements;
+            throw new Error("Tip Dollars tip logic has not been implemented yet.");
             break;
         }
         case TipType.TotalDollars: {
             // statements;
+            throw new Error("Total Dollars tip logic has not been implemented yet.");
             break;
         }
         default: {
