@@ -34,6 +34,8 @@ enum TipType {
 
 // data structure for the bill
 // timestamp format: 'Sun Mar 19 2023 12:04:00 GMT-0400 (Eastern Daylight Time)'
+// tip_val should be a float even if tip_type is TipDollars or TotalDollars to ensure consistency in the frontend code
+// if tip_type is TipDollars or TotalDollars then tip_computed_amt will be computed when needed
 type Bill = {
     id: string;
     timestamp: string;
@@ -185,8 +187,10 @@ function computeBill(thisBill: Bill): Bill {
             break;
         }
         case TipType.PostTaxPct: {
-            // statements;
-            throw new Error("Post Tax Percent tip logic has not been implemented yet.");
+            // add the pre tax total and tax amount then multiply by tip decimal amount to determine computed tip amount
+            thisBill.tip_computed_amt = multiply(add(thisBill.pre_tax_total, thisBill.tax), {amount: thisBill.tip_val, scale: 2})
+            // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
+            thisBill.total = [thisBill.pre_tax_total, thisBill.tax, thisBill.tip_computed_amt].reduce(add)
             break;
         }
         case TipType.TipDollars: {
