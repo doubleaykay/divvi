@@ -8,8 +8,8 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
-const { dinero, add, subtract, multiply, toDecimal } = require('dinero.js');
-const { USD } = require('@dinero.js/currencies');
+import { Dinero, dinero, add, subtract, multiply, toDecimal } from 'dinero.js';
+import { USD } from '@dinero.js/currencies';
 
 // enum for payment type for a given person
 enum PayType {
@@ -19,9 +19,9 @@ enum PayType {
 
 // data structure for a person
 type Person = {
-    pre_tax_amt: number;
+    pre_tax_amt: Dinero<number>;
     pay_type: PayType;
-    contribution: number | undefined;
+    contribution: Dinero<number> | undefined;
 }
 
 // enum for tip calculation method for a given bill
@@ -34,7 +34,6 @@ enum TipType {
 
 // data structure for the bill
 // timestamp format: 'Sun Mar 19 2023 12:04:00 GMT-0400 (Eastern Daylight Time)'
-// tip_val should be a float even if tip_type is TipDollars or TotalDollars to ensure consistency in the frontend code
 // if tip_type is TipDollars or TotalDollars then tip_computed_amt will be computed when needed
 type Bill = {
     id: string;
@@ -42,12 +41,13 @@ type Bill = {
     people: {
         [key: string]: Person
     };
-    tax: number;
+    tax: Dinero<number>;
     tip_type: TipType;
-    tip_val: number;
-    tip_computed_amt: number | undefined;
-    pre_tax_total: number | undefined;
-    total: number | undefined;
+    tip_pct_requested: number | undefined;
+    tip_amt_requested: Dinero<number> | undefined;
+    tip_computed_amt: Dinero<number> | undefined;
+    pre_tax_total: Dinero<number> | undefined;
+    total: Dinero<number> | undefined;
 }
 
 function getFrontendData(): Bill {
@@ -93,7 +93,8 @@ function getFrontendData(): Bill {
         },
         tax: dinero({ amount: 588, currency: USD }),
         tip_type: TipType.PreTaxPct,
-        tip_val: 20,
+        tip_pct_requested: 20,
+        tip_amt_requested: undefined,
         tip_computed_amt: undefined,
         pre_tax_total: undefined,
         total: undefined
@@ -116,7 +117,8 @@ function getFrontendData(): Bill {
         },
         tax: dinero({ amount: 483, currency: USD }),
         tip_type: TipType.PreTaxPct,
-        tip_val: 20,
+        tip_pct_requested: 20,
+        tip_amt_requested: undefined,
         tip_computed_amt: undefined,
         pre_tax_total: undefined,
         total: undefined
@@ -144,7 +146,8 @@ function getFrontendData(): Bill {
         },
         tax: dinero({ amount: 483, currency: USD }),
         tip_type: TipType.PreTaxPct,
-        tip_val: 20,
+        tip_pct_requested: 20,
+        tip_amt_requested: undefined,
         tip_computed_amt: undefined,
         pre_tax_total: undefined,
         total: undefined
@@ -155,41 +158,40 @@ function getFrontendData(): Bill {
 
 function computeBill(thisBill: Bill): Bill {
     // 1: compute pre_tax_total using each person's pre_tax_amt
-    thisBill.pre_tax_total = Object.values(thisBill.people).reduce((accumulator: number, currentValue: Person): number => {
+    thisBill.pre_tax_total = Object.values(thisBill.people).reduce((accumulator: Dinero<number>, currentValue: Person): Dinero<number> => {
         return add(accumulator, currentValue.pre_tax_amt)
     }, dinero({ amount: 0, currency: USD }))
 
     // 2: compute tip amount using method flag stored in thisBill
     // and 3: compute thisBill's total amount
-    // use Bill.tip_type, Bill.tip_val, and Bill.pre_tax_total to compute Bill.total
+    // use Bill.tip_type, Bill.tip_pct_requested or Bill.tip_amt_requested, and Bill.pre_tax_total to compute Bill.total
     switch(thisBill.tip_type) {
         case TipType.PreTaxPct: {
             // multiply pre tax total by the tip decimal amount to determine the computed tip amount
-            thisBill.tip_computed_amt = multiply(thisBill.pre_tax_total, {amount: thisBill.tip_val, scale: 2})
+            thisBill.tip_computed_amt = multiply(thisBill.pre_tax_total, {amount: thisBill.tip_pct_requested, scale: 2})
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.pre_tax_total, thisBill.tax, thisBill.tip_computed_amt].reduce(add)
             break;
         }
         case TipType.PostTaxPct: {
             // add the pre tax total and tax amount then multiply by tip decimal amount to determine computed tip amount
-            thisBill.tip_computed_amt = multiply(add(thisBill.pre_tax_total, thisBill.tax), {amount: thisBill.tip_val, scale: 2})
+            thisBill.tip_computed_amt = multiply(add(thisBill.pre_tax_total, thisBill.tax), {amount: thisBill.tip_pct_requested, scale: 2})
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.pre_tax_total, thisBill.tax, thisBill.tip_computed_amt].reduce(add)
             break;
         }
         case TipType.TipDollars: {
-            // convert tip_val float to a dinero currency object
-            thisBill.tip_computed_amt = dinero({ amount: thisBill.tip_val * 1000, currency: USD }) // TODO: is this correct?
+            // since thisBill.tip_amt_requested already represents the amount of the tip, assign it as such
+            thisBill.tip_computed_amt = thisBill.tip_amt_requested
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.pre_tax_total, thisBill.tax, thisBill.tip_computed_amt].reduce(add)
             break;
         }
         case TipType.TotalDollars: {
-            // convert tip_val float to a dinero currency object
-            // since this already represents the total, assign it correctly
-            thisBill.total = dinero({ amount: thisBill.tip_val * 1000, currency: USD }) // TODO: is this correct?
+            // since thisBill.tip_amt_requested already represents the total, assign it as such
+            thisBill.total = thisBill.tip_amt_requested
             // for completeness, compute tip amount
-            let post_tax_total: number = add(thisBill.pre_tax_total, thisBill.tax)
+            let post_tax_total: Dinero<number> = add(thisBill.pre_tax_total, thisBill.tax)
             thisBill.tip_computed_amt = subtract(thisBill.total, post_tax_total)
             break;
         }
