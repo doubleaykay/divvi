@@ -155,7 +155,7 @@ function getFrontendData(): Bill {
 
 function computeBill(thisBill: Bill): Bill {
     // 1: compute pre_tax_total using each person's pre_tax_amt
-    thisBill.pre_tax_total = Object.values(thisBill.people).reduce((accumulator, currentValue): number => {
+    thisBill.pre_tax_total = Object.values(thisBill.people).reduce((accumulator: number, currentValue: Person): number => {
         return add(accumulator, currentValue.pre_tax_amt)
     }, dinero({ amount: 0, currency: USD }))
 
