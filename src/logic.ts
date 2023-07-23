@@ -45,9 +45,9 @@ type Bill = {
     tax: number;
     tip_type: TipType;
     tip_val: number;
-    tip_computed_amt: number;
+    tip_computed_amt: number | undefined;
     pre_tax_total: number | undefined;
-    total: number | undefined
+    total: number | undefined;
 }
 
 function getFrontendData(): Bill {
