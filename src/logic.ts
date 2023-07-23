@@ -93,7 +93,7 @@ function getFrontendData(): Bill {
         },
         tax: dinero({ amount: 588, currency: USD }),
         tip_type: TipType.PreTaxPct,
-        tip_val: 20.00,
+        tip_val: 20,
         tip_computed_amt: undefined,
         pre_tax_total: undefined,
         total: undefined
@@ -194,8 +194,10 @@ function computeBill(thisBill: Bill): Bill {
             break;
         }
         case TipType.TipDollars: {
-            // statements;
-            throw new Error("Tip Dollars tip logic has not been implemented yet.");
+            // convert tip_val float to a dinero currency object
+            thisBill.tip_computed_amt = dinero({ amount: thisBill.tip_val * 1000, currency: USD })
+            // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
+            thisBill.total = [thisBill.pre_tax_total, thisBill.tax, thisBill.tip_computed_amt].reduce(add)
             break;
         }
         case TipType.TotalDollars: {
