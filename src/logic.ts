@@ -8,7 +8,7 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
-const { dinero, add, multiply, toDecimal } = require('dinero.js');
+const { dinero, add, subtract, multiply, toDecimal } = require('dinero.js');
 const { USD } = require('@dinero.js/currencies');
 
 // enum for payment type for a given person
@@ -195,14 +195,18 @@ function computeBill(thisBill: Bill): Bill {
         }
         case TipType.TipDollars: {
             // convert tip_val float to a dinero currency object
-            thisBill.tip_computed_amt = dinero({ amount: thisBill.tip_val * 1000, currency: USD })
+            thisBill.tip_computed_amt = dinero({ amount: thisBill.tip_val * 1000, currency: USD }) // TODO: is this correct?
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.pre_tax_total, thisBill.tax, thisBill.tip_computed_amt].reduce(add)
             break;
         }
         case TipType.TotalDollars: {
-            // statements;
-            throw new Error("Total Dollars tip logic has not been implemented yet.");
+            // convert tip_val float to a dinero currency object
+            // since this already represents the total, assign it correctly
+            thisBill.total = dinero({ amount: thisBill.tip_val * 1000, currency: USD }) // TODO: is this correct?
+            // for completeness, compute tip amount
+            let post_tax_total: number = add(thisBill.pre_tax_total, thisBill.tax)
+            thisBill.tip_computed_amt = subtract(thisBill.total, post_tax_total)
             break;
         }
         default: {
