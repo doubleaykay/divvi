@@ -43,6 +43,7 @@ type Bill = {
     tax: number;
     tip_type: TipType;
     tip_val: number;
+    tip_computed_amt: number;
     pre_tax_total: number | undefined;
     total: number | undefined
 }
@@ -90,7 +91,8 @@ function getFrontendData(): Bill {
         },
         tax: dinero({ amount: 588, currency: USD }),
         tip_type: TipType.PreTaxPct,
-        tip_val: 20,
+        tip_val: 20.00,
+        tip_computed_amt: undefined,
         pre_tax_total: undefined,
         total: undefined
     }
@@ -113,6 +115,7 @@ function getFrontendData(): Bill {
         tax: dinero({ amount: 483, currency: USD }),
         tip_type: TipType.PreTaxPct,
         tip_val: 20,
+        tip_computed_amt: undefined,
         pre_tax_total: undefined,
         total: undefined
     }
@@ -140,16 +143,12 @@ function getFrontendData(): Bill {
         tax: dinero({ amount: 483, currency: USD }),
         tip_type: TipType.PreTaxPct,
         tip_val: 20,
+        tip_computed_amt: undefined,
         pre_tax_total: undefined,
         total: undefined
     }
 
     return dco_dinner
-}
-
-function convertPctToScale(pct: number): number {
-    // TODO this assumes that the input is a whole number representing percent
-    return dinero({ amount: pct, scale: 2 })
 }
 
 function computeBill(thisBill: Bill): Bill {
@@ -179,7 +178,10 @@ function computeBill(thisBill: Bill): Bill {
     // use Bill.tip_type, Bill.tip_val, and Bill.pre_tax_total to compute Bill.total
     switch(thisBill.tip_type) {
         case TipType.PreTaxPct: {
-            let tip_amt: number = multiply(thisBill.pre_tax_total, convertPctToScale(thisBill.tip_val))
+            // multiply pre tax total by the tip decimal amount to determine the computed tip amount
+            thisBill.tip_computed_amt = multiply(thisBill.pre_tax_total, {amount: thisBill.tip_val, scale: 2})
+            // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
+            thisBill.total = [thisBill.pre_tax_total, thisBill.tax, thisBill.tip_computed_amt].reduce(add)
             break;
         }
         case TipType.PostTaxPct: {
@@ -212,7 +214,7 @@ function computeBill(thisBill: Bill): Bill {
 
     // 7: determine each exact person's amount
 
-    console.log(toDecimal(thisBill.pre_tax_total))
+    console.log(toDecimal(thisBill.total))
 
     return thisBill
 }
