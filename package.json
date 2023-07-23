@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^20.4.4",
     "ts-loader": "^9.4.2",
     "typescript": "^5.0.2",
     "webpack": "^5.76.2",
