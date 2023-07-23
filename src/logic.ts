@@ -154,29 +154,13 @@ function getFrontendData(): Bill {
 }
 
 function computeBill(thisBill: Bill): Bill {
-    /* proposed strategy to compute a bill */
-
-    // 1: compute pre_tax_total using each person's pre_tax_amt
-
-    // 2: compute tip amount using method flag stored in thisBill
-
-    // 3: compute thisBill's total amount
-
-    // 4: determine each person's contribution percentage
-
-    // 5: determine each person's tentative amount
-
-    // 6: adjust each person's amount based on their payment preference
-
-
-    /* alternative proposed strategy to compute a bill */
-
     // 1: compute pre_tax_total using each person's pre_tax_amt
     thisBill.pre_tax_total = Object.values(thisBill.people).reduce((accumulator, currentValue): number => {
         return add(accumulator, currentValue.pre_tax_amt)
     }, dinero({ amount: 0, currency: USD }))
 
     // 2: compute tip amount using method flag stored in thisBill
+    // and 3: compute thisBill's total amount
     // use Bill.tip_type, Bill.tip_val, and Bill.pre_tax_total to compute Bill.total
     switch(thisBill.tip_type) {
         case TipType.PreTaxPct: {
@@ -213,8 +197,6 @@ function computeBill(thisBill: Bill): Bill {
             throw new Error("Tip type stored in bill does not match enum val");
         }
     }
-
-    // 3: compute thisBill's total amount
 
     // 4: determine each person's ideal contribution percentage
 
