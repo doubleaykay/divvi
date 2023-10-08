@@ -184,7 +184,7 @@ function computeBill(thisBill: Bill): Bill {
         case TipType.PreTaxPct: {
             console.log('tip type pre tax pct')
             // multiply pre tax total by the tip decimal amount to determine the computed tip amount
-            thisBill.tip_amt_computed = allocate(thisBill.total_pre_tax, [thisBill.tip_pct_requested, 100-thisBill.tip_pct_requested])[0]
+            thisBill.tip_amt_computed = allocate(thisBill.total_pre_tax, [thisBill.tip_pct_requested, 100 - thisBill.tip_pct_requested])[0]
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
             console.log(toDecimal(thisBill.tip_amt_computed))
@@ -194,7 +194,7 @@ function computeBill(thisBill: Bill): Bill {
         case TipType.PostTaxPct: {
             console.log('tip type post tax pct')
             // add the pre tax total and tax amount then multiply by tip decimal amount to determine computed tip amount
-            thisBill.tip_amt_computed = allocate(add(thisBill.total_pre_tax, thisBill.tax_amt), [thisBill.tip_pct_requested, 100-thisBill.tip_pct_requested])[0]
+            thisBill.tip_amt_computed = allocate(add(thisBill.total_pre_tax, thisBill.tax_amt), [thisBill.tip_pct_requested, 100 - thisBill.tip_pct_requested])[0]
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
             console.log(toDecimal(thisBill.tip_amt_computed))
@@ -250,14 +250,14 @@ function computeBill(thisBill: Bill): Bill {
         // TODO: this depends on the order of people and the allocated result staying the same. that feels too hack-y... is there a better way?
         console.log('nobody is paying cash')
         let people_keys: string[] = Object.keys(thisBill.people)
-        let allocation_array: number[] = Object.keys(thisBill.people).reduce( function(allocation_array, key) {
+        let allocation_array: number[] = Object.keys(thisBill.people).reduce(function (allocation_array, key) {
             allocation_array.push(thisBill.people[key].contribution_ideal)
             return allocation_array
         }, [])
 
         let allocated_total: Dinero<number>[] = allocate(thisBill.total, allocation_array)
 
-        allocated_total.forEach( (amt, index) => {
+        allocated_total.forEach((amt, index) => {
             thisBill.people[people_keys[index]].contribution_calculated = amt
         })
     } else {
@@ -279,7 +279,7 @@ function computeBill(thisBill: Bill): Bill {
 
 
 
-    
+
 
     // 6: Recompute remaining balance and each exact person's contribution percentage to that balance
 
