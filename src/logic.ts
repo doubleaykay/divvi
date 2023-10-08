@@ -219,9 +219,9 @@ function getFrontendData(): Bill {
         total: undefined
     }
 
-    // return dco_dinner
+    return dco_dinner
     // return dumpling_dinner
-    return squad_at_99
+    // return squad_at_99
 }
 
 function computeBill(thisBill: Bill): Bill {
@@ -326,33 +326,71 @@ function computeBill(thisBill: Bill): Bill {
         // determine each exact person's amount
         console.log('some people are paying cash')
 
+        // // START ALGO 1
+        // // init empty dinero object to track total of rounded people's contribution
+        // let rounded_total: Dinero<number> = dinero({ amount: 0, currency: USD })
+
+        // // round everyone who is paying cash
+        // keys_cash_people.forEach((key) => {
+        //     thisBill.people[key].contribution_calculated = dround(thisBill.people[key].contribution_calculated)
+        //     rounded_total = add(rounded_total, thisBill.people[key].contribution_calculated)
+        // })
+
+        // // determine remaining total to allocate across exact people
+        // let remaining_total: Dinero<number> = subtract(thisBill.total, rounded_total)
+        // let remaining_total_dec: number = +toDecimal(remaining_total)
+        // let new_allocation_targets: { [key: string]: number } = {}
+
+        // // compute new contribution amounts for exact people
+        // keys_exact_people.forEach((key) => {
+        //     thisBill.people[key].contribution_pct_ideal = +toDecimal(thisBill.people[key].contribution_pre_tax) / remaining_total_dec;
+        //     new_allocation_targets[key] = thisBill.people[key].contribution_pct_ideal
+        // })
+
+        // // allocate remaining amount for exact people over exact people
+        // let new_allocated = pallocate(remaining_total, new_allocation_targets)
+
+        // // assign newly allocated amounts to the relevant people
+        // for (const key in new_allocated) {
+        //     thisBill.people[key].contribution_calculated = new_allocated[key]
+        // }
+        // // END ALGO 1
+
+        // START ALGO 2
         // init empty dinero object to track total of rounded people's contribution
+        let pre_rounded_total: Dinero<number> = dinero({ amount: 0, currency: USD })
         let rounded_total: Dinero<number> = dinero({ amount: 0, currency: USD })
 
-        // round everyone who is paying cash
+        // compute the cash people's pre-rounded total
+        keys_cash_people.forEach((key) => {
+            pre_rounded_total = add(pre_rounded_total, thisBill.people[key].contribution_calculated)
+        })
+
+        // round everyone who is paying cash and compute their new total
         keys_cash_people.forEach((key) => {
             thisBill.people[key].contribution_calculated = dround(thisBill.people[key].contribution_calculated)
             rounded_total = add(rounded_total, thisBill.people[key].contribution_calculated)
         })
 
-        // determine remaining total to allocate across exact people
-        let remaining_total: Dinero<number> = subtract(thisBill.total, rounded_total)
-        let remaining_total_dec: number = +toDecimal(remaining_total)
-        let new_allocation_targets: { [key: string]: number } = {}
+        // compute pre_rounded_total - rounded_total
+        let rounded_diff: Dinero<number> = subtract(pre_rounded_total, rounded_total)
 
-        // compute new contribution amounts for exact people
-        keys_exact_people.forEach((key) => {
-            thisBill.people[key].contribution_pct_ideal = +toDecimal(thisBill.people[key].contribution_pre_tax) / remaining_total_dec;
-            new_allocation_targets[key] = thisBill.people[key].contribution_pct_ideal
-        })
-
-        // allocate remaining amount for exact people over exact people
-        let new_allocated = pallocate(remaining_total, new_allocation_targets)
-
-        // assign newly allocated amounts to the relevant people
-        for (const key in new_allocated) {
-            thisBill.people[key].contribution_calculated = new_allocated[key]
+        // if rounded_diff is positive, rounded people are paying less so others must pay more to compensate
+        // if rounded_diff is negative, rounded people are paying more so others must pay less to compensate
+        // if rounded_diff is zero then no change needs to be made (i.e. cash people were already paying whole dollar amounts)
+        // in any case except the zero case, just evenly allocate rounded_diff across the remaining people and add to their contributions...
+        // if positive then they will pay more, if negative then they will pay less... it "just works"!
+        if (!isZero(rounded_diff)) {
+            let new_allocation_targets: { [key: string]: number } = {}
+            keys_exact_people.forEach((key) => {
+                new_allocation_targets[key] = 1
+            })
+            let new_allocated: { [key: string]: Dinero<number> } = pallocate(rounded_diff, new_allocation_targets)
+            for (const key in new_allocated) {
+                thisBill.people[key].contribution_calculated = add(thisBill.people[key].contribution_calculated, new_allocated[key])
+            }
         }
+        // END ALGO 2
     }
 
     // temp print results to console
