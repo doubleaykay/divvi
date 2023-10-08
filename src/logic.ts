@@ -164,7 +164,7 @@ function getFrontendData(): Bill {
         total: undefined
     }
 
-    return dco_dinner
+    return squad_at_99
 }
 
 function computeBill(thisBill: Bill): Bill {
@@ -219,6 +219,10 @@ function computeBill(thisBill: Bill): Bill {
     }
 
     // 5: determine rounded contribution for each cash person
+    var keys_cash_people: string[] = Object.keys(thisBill.people).reduce(function (filtered, key) {
+        if (thisBill.people[key].pay_type == PayType.Cash) filtered.push(key);
+        return filtered;
+    }, []);
 
     // 6: Recompute remaining balance and each exact person's contribution percentage to that balance
 
