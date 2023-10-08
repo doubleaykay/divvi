@@ -51,14 +51,14 @@ type Bill = {
     total: Dinero<number> | undefined;
 }
 
-function pallocate(amount: Dinero<number>, targets: {[key: string]: number}): {[key: string]: Dinero<number>} {
+function pallocate(amount: Dinero<number>, targets: { [key: string]: number }): { [key: string]: Dinero<number> } {
     // compute total of ratio list
     let ratio_total: number = Object.values(targets).reduce((accumulator: number, currentValue: number): number => {
         return accumulator + currentValue
     }, 0)
 
     // init result dictionary
-    let result: {[key: string]: Dinero<number>} = {}
+    let result: { [key: string]: Dinero<number> } = {}
 
     // set remainder to amount
     let remainder: Dinero<number> = amount
@@ -89,7 +89,7 @@ function pallocate(amount: Dinero<number>, targets: {[key: string]: number}): {[
         }
     } else if (isNegative(remainder)) {
         // remove one starting at the end of result
-        Object.keys(result).reverse().forEach( (key) => {
+        Object.keys(result).reverse().forEach((key) => {
             if (isZero(remainder)) {
                 return result
             } else {
@@ -295,10 +295,10 @@ function computeBill(thisBill: Bill): Bill {
     // determine each exact person's amount
 
     // 5: determine rounded contribution for each cash person
-    
+
 
     // allocate thisBill.total across everyone. if there are people paying cash, then additional processing is needed
-    let allocation_targets: {[key: string]: number} = {}
+    let allocation_targets: { [key: string]: number } = {}
 
     for (const key in thisBill.people) {
         allocation_targets[key] = thisBill.people[key].contribution_pct_ideal
@@ -330,7 +330,7 @@ function computeBill(thisBill: Bill): Bill {
         let rounded_total: Dinero<number> = dinero({ amount: 0, currency: USD })
 
         // round everyone who is paying cash
-        keys_cash_people.forEach( (key) => {
+        keys_cash_people.forEach((key) => {
             thisBill.people[key].contribution_calculated = dround(thisBill.people[key].contribution_calculated)
             rounded_total = add(rounded_total, thisBill.people[key].contribution_calculated)
         })
@@ -338,10 +338,10 @@ function computeBill(thisBill: Bill): Bill {
         // determine remaining total to allocate across exact people
         let remaining_total: Dinero<number> = subtract(thisBill.total, rounded_total)
         let remaining_total_dec: number = +toDecimal(remaining_total)
-        let new_allocation_targets: {[key: string]: number} = {}
+        let new_allocation_targets: { [key: string]: number } = {}
 
         // compute new contribution amounts for exact people
-        keys_exact_people.forEach( (key) => {
+        keys_exact_people.forEach((key) => {
             thisBill.people[key].contribution_pct_ideal = +toDecimal(thisBill.people[key].contribution_pre_tax) / remaining_total_dec;
             new_allocation_targets[key] = thisBill.people[key].contribution_pct_ideal
         })
@@ -352,7 +352,7 @@ function computeBill(thisBill: Bill): Bill {
         // assign newly allocated amounts to the relevant people
         for (const key in new_allocated) {
             thisBill.people[key].contribution_calculated = new_allocated[key]
-        }   
+        }
     }
 
     // temp print results to console
@@ -362,7 +362,7 @@ function computeBill(thisBill: Bill): Bill {
         console.log(toDecimal(thisBill.people[key].contribution_calculated, ({ value, currency }) => `${currency.code} ${value}`))
     }
 
-    
+
     // 6: Recompute remaining balance and each exact person's contribution percentage to that balance
 
     // 7: determine each exact person's amount
