@@ -184,7 +184,7 @@ function computeBill(thisBill: Bill): Bill {
         case TipType.PreTaxPct: {
             console.log('tip type pre tax pct')
             // multiply pre tax total by the tip decimal amount to determine the computed tip amount
-            thisBill.tip_amt_computed = multiply(thisBill.total_pre_tax, { amount: thisBill.tip_pct_requested, scale: 2 })
+            thisBill.tip_amt_computed = allocate(thisBill.total_pre_tax, [thisBill.tip_pct_requested, 100-thisBill.tip_pct_requested])[0]
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
             console.log(toDecimal(thisBill.tip_amt_computed))
@@ -194,7 +194,7 @@ function computeBill(thisBill: Bill): Bill {
         case TipType.PostTaxPct: {
             console.log('tip type post tax pct')
             // add the pre tax total and tax amount then multiply by tip decimal amount to determine computed tip amount
-            thisBill.tip_amt_computed = multiply(add(thisBill.total_pre_tax, thisBill.tax_amt), { amount: thisBill.tip_pct_requested, scale: 2 })
+            thisBill.tip_amt_computed = allocate(add(thisBill.total_pre_tax, thisBill.tax_amt), [thisBill.tip_pct_requested, 100-thisBill.tip_pct_requested])[0]
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
             console.log(toDecimal(thisBill.tip_amt_computed))
@@ -234,18 +234,18 @@ function computeBill(thisBill: Bill): Bill {
         thisBill.people[person].contribution_ideal = +toDecimal(thisBill.people[person].contribution_pre_tax) / total_pre_tax_decimal;
     }
 
+    // 5: if everyone is paying exact, use the ideal contribution percent to determine each person's contribution
+    // otherwise, determine rounded contribution for each cash person, then
+    // Recompute remaining balance and each exact person's contribution percentage to that balance, then
+    // determine each exact person's amount
+
     // 5: determine rounded contribution for each cash person
     var keys_cash_people: string[] = Object.keys(thisBill.people).reduce(function (filtered, key) {
         if (thisBill.people[key].pay_type == PayType.Cash) filtered.push(key);
         return filtered;
     }, []);
 
-    if (keys_cash_people.length) {
-        console.log('some people are paying cash')
-        // keys_cash_people.forEach( (key) => {
-        //     thisBill.people[key].contribution_calculated = allocate(thisBill.total, [thisBill.people[key].contribution_ideal, 1-thisBill.people[key].contribution_ideal])[0]
-        // })
-    } else {
+    if (keys_cash_people.length == 0) {
         // nobody is paying cash, so allocate thisBill.total over each Person.contribution_ideal
         // TODO: this depends on the order of people and the allocated result staying the same. that feels too hack-y... is there a better way?
         console.log('nobody is paying cash')
@@ -260,6 +260,14 @@ function computeBill(thisBill: Bill): Bill {
         allocated_total.forEach( (amt, index) => {
             thisBill.people[people_keys[index]].contribution_calculated = amt
         })
+    } else {
+        // some people are paying cash, so determine rounded contribution for each cash person, then
+        // Recompute remaining balance and each exact person's contribution percentage to that balance, then
+        // determine each exact person's amount
+        console.log('some people are paying cash')
+        // keys_cash_people.forEach( (key) => {
+        //     thisBill.people[key].contribution_calculated = allocate(thisBill.total, [thisBill.people[key].contribution_ideal, 1-thisBill.people[key].contribution_ideal])[0]
+        // })
     }
 
     // temp print results to console
