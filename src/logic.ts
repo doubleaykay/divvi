@@ -297,19 +297,18 @@ function computeBill(thisBill: Bill): Bill {
 
     if (keys_cash_people.length == 0) {
         // nobody is paying cash, so allocate thisBill.total over each Person.contribution_ideal
-        // TODO: this depends on the order of people and the allocated result staying the same. that feels too hack-y... is there a better way?
-        console.log('nobody is paying cash')
-        let people_keys: string[] = Object.keys(thisBill.people)
-        let allocation_array: number[] = Object.keys(thisBill.people).reduce(function (allocation_array, key) {
-            allocation_array.push(thisBill.people[key].contribution_ideal)
-            return allocation_array
-        }, [])
+        let allocation_targets: {[key: string]: number} = {}
 
-        let allocated_total: Dinero<number>[] = allocate(thisBill.total, allocation_array)
+        for (const key in thisBill.people) {
+            allocation_targets[key] = thisBill.people[key].contribution_ideal
+        }
 
-        allocated_total.forEach((amt, index) => {
-            thisBill.people[people_keys[index]].contribution_calculated = amt
-        })
+        let allocated = pallocate(thisBill.total, allocation_targets)
+
+        for (const key in allocated) {
+            thisBill.people[key].contribution_calculated = allocated[key]
+        }
+        
     } else {
         // some people are paying cash, so determine rounded contribution for each cash person, then
         // Recompute remaining balance and each exact person's contribution percentage to that balance, then
@@ -326,23 +325,6 @@ function computeBill(thisBill: Bill): Bill {
         console.log(key)
         console.log(toDecimal(thisBill.people[key].contribution_calculated, ({ value, currency }) => `${currency.code} ${value}`))
     }
-
-    console.log('TEST PALLOCATE')
-
-    let testpeople: {[key: string]: number} = {}
-
-    for (const key in thisBill.people) {
-        testpeople[key] = thisBill.people[key].contribution_ideal
-    }
-
-    let testing = pallocate(thisBill.total, testpeople)
-    for (const key in testing) {
-        console.log(key)
-        console.log(toDecimal(testing[key]))
-    }
-
-
-
 
 
     // 6: Recompute remaining balance and each exact person's contribution percentage to that balance
