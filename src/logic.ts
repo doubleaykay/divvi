@@ -8,7 +8,7 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
-import { Dinero, dinero, add, subtract, multiply, toDecimal } from 'dinero.js';
+import { Dinero, dinero, add, subtract, multiply, toDecimal, allocate } from 'dinero.js';
 import { USD } from '@dinero.js/currencies';
 
 // enum for payment type for a given person
@@ -164,7 +164,9 @@ function getFrontendData(): Bill {
         total: undefined
     }
 
-    return squad_at_99
+    return dco_dinner
+    // return dumpling_dinner
+    // return squad_at_99
 }
 
 function computeBill(thisBill: Bill): Bill {
@@ -173,37 +175,51 @@ function computeBill(thisBill: Bill): Bill {
         return add(accumulator, currentValue.contribution_pre_tax)
     }, dinero({ amount: 0, currency: USD }))
 
+    console.log(toDecimal(thisBill.total_pre_tax))
+
     // 2: compute tip amount using method flag stored in thisBill
     // and 3: compute thisBill's total amount
     // use Bill.tip_type, Bill.tip_pct_requested or Bill.tip_amt_requested, and Bill.pre_tax_total to compute Bill.total
     switch (thisBill.tip_type) {
         case TipType.PreTaxPct: {
+            console.log('tip type pre tax pct')
             // multiply pre tax total by the tip decimal amount to determine the computed tip amount
             thisBill.tip_amt_computed = multiply(thisBill.total_pre_tax, { amount: thisBill.tip_pct_requested, scale: 2 })
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
+            console.log(toDecimal(thisBill.tip_amt_computed))
+            console.log(toDecimal(thisBill.total))
             break;
         }
         case TipType.PostTaxPct: {
+            console.log('tip type post tax pct')
             // add the pre tax total and tax amount then multiply by tip decimal amount to determine computed tip amount
             thisBill.tip_amt_computed = multiply(add(thisBill.total_pre_tax, thisBill.tax_amt), { amount: thisBill.tip_pct_requested, scale: 2 })
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
+            console.log(toDecimal(thisBill.tip_amt_computed))
+            console.log(toDecimal(thisBill.total))
             break;
         }
         case TipType.TipDollars: {
+            console.log('tip type tip dollars')
             // since thisBill.tip_amt_requested already represents the amount of the tip, assign it as such
             thisBill.tip_amt_computed = thisBill.tip_amt_requested
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
+            console.log(toDecimal(thisBill.tip_amt_computed))
+            console.log(toDecimal(thisBill.total))
             break;
         }
         case TipType.TotalDollars: {
+            console.log('tip type total dollars')
             // since thisBill.tip_amt_requested already represents the total, assign it as such
             thisBill.total = thisBill.tip_amt_requested
             // for completeness, compute tip amount
             let total_post_tax: Dinero<number> = add(thisBill.total_pre_tax, thisBill.tax_amt)
             thisBill.tip_amt_computed = subtract(thisBill.total, total_post_tax)
+            console.log(toDecimal(thisBill.tip_amt_computed))
+            console.log(toDecimal(thisBill.total))
             break;
         }
         default: {
@@ -224,11 +240,44 @@ function computeBill(thisBill: Bill): Bill {
         return filtered;
     }, []);
 
+    if (keys_cash_people.length) {
+        console.log('some people are paying cash')
+        // keys_cash_people.forEach( (key) => {
+        //     thisBill.people[key].contribution_calculated = allocate(thisBill.total, [thisBill.people[key].contribution_ideal, 1-thisBill.people[key].contribution_ideal])[0]
+        // })
+    } else {
+        // nobody is paying cash, so allocate thisBill.total over each Person.contribution_ideal
+        // TODO: this depends on the order of people and the allocated result staying the same. that feels too hack-y... is there a better way?
+        console.log('nobody is paying cash')
+        let people_keys: string[] = Object.keys(thisBill.people)
+        let allocation_array: number[] = Object.keys(thisBill.people).reduce( function(allocation_array, key) {
+            allocation_array.push(thisBill.people[key].contribution_ideal)
+            return allocation_array
+        }, [])
+
+        let allocated_total: Dinero<number>[] = allocate(thisBill.total, allocation_array)
+
+        allocated_total.forEach( (amt, index) => {
+            thisBill.people[people_keys[index]].contribution_calculated = amt
+        })
+    }
+
+    // temp print results to console
+    console.log(toDecimal(thisBill.total))
+    for (const key in thisBill.people) {
+        console.log(key)
+        console.log(toDecimal(thisBill.people[key].contribution_calculated, ({ value, currency }) => `${currency.code} ${value}`))
+    }
+
+
+
+    
+
     // 6: Recompute remaining balance and each exact person's contribution percentage to that balance
 
     // 7: determine each exact person's amount
 
-    console.log(toDecimal(thisBill.total))
+    // console.log(toDecimal(thisBill.total))
 
     return thisBill
 }
