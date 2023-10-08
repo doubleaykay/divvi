@@ -21,6 +21,7 @@ enum PayType {
 type Person = {
     contribution_pre_tax: Dinero<number>;
     pay_type: PayType;
+    contribution_ideal: number;
     contribution_calculated: Dinero<number> | undefined;
 }
 
@@ -68,26 +69,31 @@ function getFrontendData(): Bill {
             "Grace": {
                 contribution_pre_tax: dinero({ amount: 2200, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Sachin": {
                 contribution_pre_tax: dinero({ amount: 1500, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Anoush": {
                 contribution_pre_tax: dinero({ amount: 1900, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Guadalupe": {
                 contribution_pre_tax: dinero({ amount: 600, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Sophia": {
                 contribution_pre_tax: dinero({ amount: 700, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             }
         },
@@ -107,11 +113,13 @@ function getFrontendData(): Bill {
             "Anoush": {
                 contribution_pre_tax: dinero({ amount: 2343, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Seth": {
                 contribution_pre_tax: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             }
         },
@@ -131,16 +139,19 @@ function getFrontendData(): Bill {
             "Anoush": {
                 contribution_pre_tax: dinero({ amount: 2343, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Dan": {
                 contribution_pre_tax: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Exact,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Charlie": {
                 contribution_pre_tax: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Cash,
+                contribution_ideal: undefined,
                 contribution_calculated: undefined
             }
         },
@@ -165,17 +176,17 @@ function computeBill(thisBill: Bill): Bill {
     // 2: compute tip amount using method flag stored in thisBill
     // and 3: compute thisBill's total amount
     // use Bill.tip_type, Bill.tip_pct_requested or Bill.tip_amt_requested, and Bill.pre_tax_total to compute Bill.total
-    switch(thisBill.tip_type) {
+    switch (thisBill.tip_type) {
         case TipType.PreTaxPct: {
             // multiply pre tax total by the tip decimal amount to determine the computed tip amount
-            thisBill.tip_amt_computed = multiply(thisBill.total_pre_tax, {amount: thisBill.tip_pct_requested, scale: 2})
+            thisBill.tip_amt_computed = multiply(thisBill.total_pre_tax, { amount: thisBill.tip_pct_requested, scale: 2 })
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
             break;
         }
         case TipType.PostTaxPct: {
             // add the pre tax total and tax amount then multiply by tip decimal amount to determine computed tip amount
-            thisBill.tip_amt_computed = multiply(add(thisBill.total_pre_tax, thisBill.tax_amt), {amount: thisBill.tip_pct_requested, scale: 2})
+            thisBill.tip_amt_computed = multiply(add(thisBill.total_pre_tax, thisBill.tax_amt), { amount: thisBill.tip_pct_requested, scale: 2 })
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
             thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
             break;
@@ -201,6 +212,11 @@ function computeBill(thisBill: Bill): Bill {
     }
 
     // 4: determine each person's ideal contribution percentage
+    let total_pre_tax_decimal: number = +toDecimal(thisBill.total_pre_tax)
+
+    for (let person in thisBill.people) {
+        thisBill.people[person].contribution_ideal = +toDecimal(thisBill.people[person].contribution_pre_tax) / total_pre_tax_decimal;
+    }
 
     // 5: determine rounded contribution for each cash person
 
