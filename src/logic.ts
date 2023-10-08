@@ -8,7 +8,7 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
-import { Dinero, dinero, add, subtract, multiply, toDecimal, allocate } from 'dinero.js';
+import { Dinero, dinero, add, subtract, multiply, toDecimal, allocate, isZero } from 'dinero.js';
 import { USD } from '@dinero.js/currencies';
 
 // enum for payment type for a given person
@@ -49,6 +49,43 @@ type Bill = {
     tip_amt_computed: Dinero<number> | undefined;
     total_pre_tax: Dinero<number> | undefined;
     total: Dinero<number> | undefined;
+}
+
+function pallocate(amount: Dinero<number>, targets: {[key: string]: number}): {[key: string]: Dinero<number>} {
+    let ratio_total: number = Object.values(targets).reduce((accumulator: number, currentValue: number): number => {
+        return accumulator + currentValue
+    }, 0)
+
+    let result: {[key: string]: Dinero<number>} = {}
+
+    let remainder: Dinero<number> = amount
+
+    // PROBLEM: ALLOCATE DOES NOT ALWAYS FLOOR! SO REMAINDER CAN GO NEGATIVE
+    for (const key in targets) {
+        result[key] = allocate(amount, [targets[key], ratio_total - targets[key]])[0]
+        remainder = subtract(remainder, result[key])
+    }
+
+    let one: Dinero<number> = dinero({ amount: 1, currency: USD })
+
+    // while remainder is more than zero, loop through each person, add 1, and subtract 1 from remainder
+    // while (!isZero(remainder)) {
+    //     for (const key in result) {
+    //         if (isZero(remainder)) {
+    //             break
+    //         } else {
+    //             add(result[key], one)
+    //             subtract(remainder, one)
+    //         }
+    //     }
+    // }
+
+    console.log(toDecimal(amount))
+    console.log(toDecimal(remainder))
+
+    console.log('pallocated!')
+
+    return result
 }
 
 function getFrontendData(): Bill {
@@ -276,6 +313,18 @@ function computeBill(thisBill: Bill): Bill {
         console.log(key)
         console.log(toDecimal(thisBill.people[key].contribution_calculated, ({ value, currency }) => `${currency.code} ${value}`))
     }
+
+    console.log('TEST PALLOCATE')
+
+    let testpeople: {[key: string]: number} = {}
+
+    for (const key in thisBill.people) {
+        testpeople[key] = thisBill.people[key].contribution_ideal
+    }
+
+    console.log(
+        pallocate(thisBill.total, testpeople)
+    )
 
 
 
