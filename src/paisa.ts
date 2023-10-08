@@ -7,6 +7,22 @@ type Paisa = {
     attribute: string | undefined;
 }
 
+function n2p(n: number, attr?: string): Paisa {
+    // convert a number with decimals to a Paisa object
+    // optionally, add an attribute
+    let attr_to_add: string | undefined;
+    if (attr != null) {
+        attr_to_add = attr
+    } else {
+        attr_to_add = undefined
+    }
+
+    return {
+        amount: n * 100,
+        attribute: attr_to_add
+    }
+}
+
 function add(...args: Paisa[]): Paisa {
     // sum the values of multiple Paisa objects
     // attributes are NOT preserved
@@ -48,5 +64,15 @@ function multiplyPN(multiplier: Paisa, multiplicand: number): Paisa {
 }
 
 function allocatePP(to_allocate: Paisa, recipients: Paisa[]): void {
-    
+    // TODO allocation algorithm
+}
+
+function p2s(p: Paisa): string {
+    // convert a Paisa object to a string with the correct decimal places
+    return (p.amount / 100).toString()
+}
+
+function p2n(p: Paisa): number {
+    // convert a paisa onject to a number with the correct decimal places
+    return p.amount / 100
 }
