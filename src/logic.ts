@@ -21,7 +21,7 @@ enum PayType {
 type Person = {
     contribution_pre_tax: Dinero<number>;
     pay_type: PayType;
-    contribution_ideal: number;
+    contribution_pct_ideal: number;
     contribution_calculated: Dinero<number> | undefined;
 }
 
@@ -124,31 +124,31 @@ function getFrontendData(): Bill {
             "Grace": {
                 contribution_pre_tax: dinero({ amount: 2200, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Sachin": {
                 contribution_pre_tax: dinero({ amount: 1500, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Anoush": {
                 contribution_pre_tax: dinero({ amount: 1900, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Guadalupe": {
                 contribution_pre_tax: dinero({ amount: 600, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Sophia": {
                 contribution_pre_tax: dinero({ amount: 700, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             }
         },
@@ -168,13 +168,13 @@ function getFrontendData(): Bill {
             "Anoush": {
                 contribution_pre_tax: dinero({ amount: 2343, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Seth": {
                 contribution_pre_tax: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             }
         },
@@ -194,19 +194,19 @@ function getFrontendData(): Bill {
             "Anoush": {
                 contribution_pre_tax: dinero({ amount: 2343, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Dan": {
                 contribution_pre_tax: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Exact,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             },
             "Charlie": {
                 contribution_pre_tax: dinero({ amount: 4562, currency: USD }),
                 pay_type: PayType.Cash,
-                contribution_ideal: undefined,
+                contribution_pct_ideal: undefined,
                 contribution_calculated: undefined
             }
         },
@@ -286,7 +286,7 @@ function computeBill(thisBill: Bill): Bill {
     let total_pre_tax_decimal: number = +toDecimal(thisBill.total_pre_tax)
 
     for (let person in thisBill.people) {
-        thisBill.people[person].contribution_ideal = +toDecimal(thisBill.people[person].contribution_pre_tax) / total_pre_tax_decimal;
+        thisBill.people[person].contribution_pct_ideal = +toDecimal(thisBill.people[person].contribution_pre_tax) / total_pre_tax_decimal;
     }
 
     // 5: if everyone is paying exact, use the ideal contribution percent to determine each person's contribution
@@ -305,7 +305,7 @@ function computeBill(thisBill: Bill): Bill {
         let allocation_targets: {[key: string]: number} = {}
 
         for (const key in thisBill.people) {
-            allocation_targets[key] = thisBill.people[key].contribution_ideal
+            allocation_targets[key] = thisBill.people[key].contribution_pct_ideal
         }
 
         let allocated = pallocate(thisBill.total, allocation_targets)
@@ -319,9 +319,7 @@ function computeBill(thisBill: Bill): Bill {
         // Recompute remaining balance and each exact person's contribution percentage to that balance, then
         // determine each exact person's amount
         console.log('some people are paying cash')
-        // keys_cash_people.forEach( (key) => {
-        //     thisBill.people[key].contribution_calculated = allocate(thisBill.total, [thisBill.people[key].contribution_ideal, 1-thisBill.people[key].contribution_ideal])[0]
-        // })
+
     }
 
     // temp print results to console
