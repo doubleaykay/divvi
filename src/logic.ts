@@ -8,7 +8,7 @@ Written by Anoush Khan and Dan Strauss, March 2023
 Adapted from Even Split code written by Anoush Khan and Dan Strauss, 2022
 */
 
-import { Dinero, dinero, add, subtract, multiply, toDecimal, allocate, isZero, isPositive, isNegative } from 'dinero.js';
+import { Dinero, dinero, add, subtract, transformScale, toDecimal, allocate, isZero, isPositive, isNegative, halfUp } from 'dinero.js';
 import { USD } from '@dinero.js/currencies';
 
 // enum for payment type for a given person
@@ -99,6 +99,11 @@ function pallocate(amount: Dinero<number>, targets: {[key: string]: number}): {[
         })
         return result
     }
+}
+
+function dround(d: Dinero<number>): Dinero<number> {
+    // correctly round a Dinero object
+    return transformScale(transformScale(d, 0, halfUp), 2)
 }
 
 function getFrontendData(): Bill {
@@ -326,7 +331,7 @@ function computeBill(thisBill: Bill): Bill {
         console.log(toDecimal(thisBill.people[key].contribution_calculated, ({ value, currency }) => `${currency.code} ${value}`))
     }
 
-
+    
     // 6: Recompute remaining balance and each exact person's contribution percentage to that balance
 
     // 7: determine each exact person's amount
