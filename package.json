@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "@dinero.js/currencies": "^2.0.0-alpha.14",
-    "dinero.js": "^2.0.0-alpha.14"
+    "bootstrap": "^5.3.2",
+    "dinero.js": "^2.0.0-alpha.14",
+    "react-bootstrap": "^2.9.0"
   }
 }
