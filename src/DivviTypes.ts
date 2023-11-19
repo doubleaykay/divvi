@@ -41,3 +41,11 @@ export type Bill = {
     total_pre_tax: Dinero<number> | undefined;
     total: Dinero<number> | undefined;
 }
+
+type BillInputData = {
+
+}
+
+type BillComputedData = {
+    
+}
