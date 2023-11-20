@@ -63,9 +63,21 @@ export type Bill = {
 }
 
 type BillInputData = {
-
+    timestamp: string;
+    people: {
+        [key: string]: Person
+    };
+    tax_amt: Dinero<number>;
+    tip_intent: TipPreTaxPct | TipPostTaxPct | TipDollars | TipTotalDollars;
 }
 
 type BillComputedData = {
-    
+    timestamp: string;
+    people: {
+        [key: string]: Person
+    };
+    tax_amt: Dinero<number>;
+    tip_amt_computed: Dinero<number>;
+    total_pre_tax: Dinero<number>;
+    total: Dinero<number>;
 }
