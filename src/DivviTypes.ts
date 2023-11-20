@@ -8,6 +8,26 @@ export enum PayType {
     Exact = "Exact",
 }
 
+// type for Pre Tax Pct Tip
+export type TipPreTaxPct = {
+    value: number
+}
+
+// type for Pre Tax Pct Tip
+export type TipPostTaxPct = {
+    value: number
+}
+
+// type for Pre Tax Pct Tip
+export type TipDollars = {
+    value: Dinero<number>
+}
+
+// type for Pre Tax Pct Tip
+export type TipTotalDollars = {
+    value: Dinero<number>
+}
+
 // data structure for a person
 export type Person = {
     contribution_pre_tax: Dinero<number>;
