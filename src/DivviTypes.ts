@@ -71,6 +71,8 @@ type BillInputData = {
     tip_intent: TipPreTaxPct | TipPostTaxPct | TipDollars | TipTotalDollars;
 }
 
+// TODO Person still has an undefined field. is there a good way to fix that?
+// TODO do we need to retain tip type information for the results view?
 type BillComputedData = {
     timestamp: string;
     people: {
