@@ -62,10 +62,25 @@ export type Bill = {
     total: Dinero<number> | undefined;
 }
 
+// Person type for data from frontend
+type PersonData = {
+    contribution_pre_tax: Dinero<number>;
+    pay_type: PayType;
+    contribution_pct_ideal: number;
+}
+
+// Person type for computed result
+type PersonResult = {
+    // contribution_pre_tax: Dinero<number>;
+    // pay_type: PayType;
+    contribution_pct_ideal: number;
+    contribution_calculated: Dinero<number>;
+}
+
 type BillInputData = {
     timestamp: string;
     people: {
-        [key: string]: Person
+        [key: string]: PersonData
     };
     tax_amt: Dinero<number>;
     tip_intent: TipPreTaxPct | TipPostTaxPct | TipDollars | TipTotalDollars;
@@ -73,10 +88,10 @@ type BillInputData = {
 
 // TODO Person still has an undefined field. is there a good way to fix that?
 // TODO do we need to retain tip type information for the results view?
-type BillComputedData = {
+type BillResult = {
     timestamp: string;
     people: {
-        [key: string]: Person
+        [key: string]: PersonResult
     };
     tax_amt: Dinero<number>;
     tip_amt_computed: Dinero<number>;
