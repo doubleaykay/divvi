@@ -77,7 +77,7 @@ export type PersonResult = {
     contribution_calculated: Dinero<number>;
 }
 
-export type BillInputData = {
+export type BillData = {
     timestamp: string;
     people: {
         [key: string]: PersonData
