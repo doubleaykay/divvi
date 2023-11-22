@@ -5,7 +5,8 @@ import { Dinero, dinero, add, subtract, transformScale, toDecimal, allocate, isZ
 import { USD } from '@dinero.js/currencies';
 
 // import types and enums from DivviTypes
-import type { Person, Bill } from './DivviTypes';
+// import type { TipPreTaxPct, TipPostTaxPct, TipDollars, TipTotalDollars } from './DivviTypes';
+import type { PersonData, PersonResult, BillData, BillResult } from './DivviTypes';
 import { PayType, TipType } from './DivviTypes';
 
 function pallocate(amount: Dinero<number>, targets: { [key: string]: number }): { [key: string]: Dinero<number> } | undefined {
@@ -69,9 +70,9 @@ function dround(d: Dinero<number>): Dinero<number> {
     return transformScale(transformScale(d, 0, halfUp), 2)
 }
 
-function computeBill(thisBill: Bill): Bill {
+function computeBill(thisBill: BillData): BillResult {
     // 1: compute pre_tax_total using each person's pre_tax_amt
-    thisBill.total_pre_tax = Object.values(thisBill.people).reduce((accumulator: Dinero<number>, currentValue: Person): Dinero<number> => {
+    let total_pre_tax: Dinero<number> = Object.values(thisBill.people).reduce((accumulator: Dinero<number>, currentValue: PersonData): Dinero<number> => {
         return add(accumulator, currentValue.contribution_pre_tax)
     }, dinero({ amount: 0, currency: USD }))
 
@@ -80,13 +81,16 @@ function computeBill(thisBill: Bill): Bill {
     // 2: compute tip amount using method flag stored in thisBill
     // and 3: compute thisBill's total amount
     // use Bill.tip_type, Bill.tip_pct_requested or Bill.tip_amt_requested, and Bill.pre_tax_total to compute Bill.total
+    let tip_amt_computed: Dinero<number>;
+    let total: Dinero<number>;
+
     switch (thisBill.tip_type) {
         case TipType.PreTaxPct: {
             // console.log('tip type pre tax pct')
             // multiply pre tax total by the tip decimal amount to determine the computed tip amount
-            thisBill.tip_amt_computed = allocate(thisBill.total_pre_tax, [thisBill.tip_pct_requested, 100 - thisBill.tip_pct_requested])[0]
+            tip_amt_computed = allocate(total_pre_tax, [thisBill.tip_pct_requested, 100 - thisBill.tip_pct_requested])[0]
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
-            thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
+            total = [total_pre_tax, thisBill.tax_amt, tip_amt_computed].reduce(add)
             // console.log(toDecimal(thisBill.tip_amt_computed))
             // console.log(toDecimal(thisBill.total))
             break;
@@ -94,9 +98,9 @@ function computeBill(thisBill: Bill): Bill {
         case TipType.PostTaxPct: {
             // console.log('tip type post tax pct')
             // add the pre tax total and tax amount then multiply by tip decimal amount to determine computed tip amount
-            thisBill.tip_amt_computed = allocate(add(thisBill.total_pre_tax, thisBill.tax_amt), [thisBill.tip_pct_requested, 100 - thisBill.tip_pct_requested])[0]
+            tip_amt_computed = allocate(add(total_pre_tax, thisBill.tax_amt), [thisBill.tip_pct_requested, 100 - thisBill.tip_pct_requested])[0]
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
-            thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
+            total = [total_pre_tax, thisBill.tax_amt, tip_amt_computed].reduce(add)
             // console.log(toDecimal(thisBill.tip_amt_computed))
             // console.log(toDecimal(thisBill.total))
             break;
@@ -104,9 +108,9 @@ function computeBill(thisBill: Bill): Bill {
         case TipType.TipDollars: {
             // console.log('tip type tip dollars')
             // since thisBill.tip_amt_requested already represents the amount of the tip, assign it as such
-            thisBill.tip_amt_computed = thisBill.tip_amt_requested
+            tip_amt_computed = thisBill.tip_amt_requested
             // add the pre tax total, tax, and the computed tip amount to determine the total bill amount
-            thisBill.total = [thisBill.total_pre_tax, thisBill.tax_amt, thisBill.tip_amt_computed].reduce(add)
+            total = [total_pre_tax, thisBill.tax_amt, tip_amt_computed].reduce(add)
             // console.log(toDecimal(thisBill.tip_amt_computed))
             // console.log(toDecimal(thisBill.total))
             break;
@@ -114,10 +118,10 @@ function computeBill(thisBill: Bill): Bill {
         case TipType.TotalDollars: {
             // console.log('tip type total dollars')
             // since thisBill.tip_amt_requested already represents the total, assign it as such
-            thisBill.total = thisBill.tip_amt_requested
+            total = thisBill.tip_amt_requested
             // for completeness, compute tip amount
-            let total_post_tax: Dinero<number> = add(thisBill.total_pre_tax, thisBill.tax_amt)
-            thisBill.tip_amt_computed = subtract(thisBill.total, total_post_tax)
+            let total_post_tax: Dinero<number> = add(total_pre_tax, thisBill.tax_amt)
+            tip_amt_computed = subtract(total, total_post_tax)
             // console.log(toDecimal(thisBill.tip_amt_computed))
             // console.log(toDecimal(thisBill.total))
             break;
@@ -128,7 +132,7 @@ function computeBill(thisBill: Bill): Bill {
     }
 
     // 4: determine each person's ideal contribution percentage
-    let total_pre_tax_decimal: number = +toDecimal(thisBill.total_pre_tax)
+    let total_pre_tax_decimal: number = +toDecimal(total_pre_tax)
 
     for (let person in thisBill.people) {
         thisBill.people[person].contribution_pct_ideal = +toDecimal(thisBill.people[person].contribution_pre_tax) / total_pre_tax_decimal;
@@ -149,7 +153,7 @@ function computeBill(thisBill: Bill): Bill {
         allocation_targets[key] = thisBill.people[key].contribution_pct_ideal
     }
 
-    let allocated = pallocate(thisBill.total, allocation_targets)
+    let allocated = pallocate(total, allocation_targets)
 
     for (const key in allocated) {
         thisBill.people[key].contribution_calculated = allocated[key]
