@@ -8,25 +8,25 @@ export enum PayType {
     Exact = "Exact",
 }
 
-// type for Pre Tax Pct Tip
-export type TipPreTaxPct = {
-    value: number
-}
+// // type for Pre Tax Pct Tip
+// export type TipPreTaxPct = {
+//     value: number
+// }
 
-// type for Pre Tax Pct Tip
-export type TipPostTaxPct = {
-    value: number
-}
+// // type for Pre Tax Pct Tip
+// export type TipPostTaxPct = {
+//     value: number
+// }
 
-// type for Pre Tax Pct Tip
-export type TipDollars = {
-    value: Dinero<number>
-}
+// // type for Pre Tax Pct Tip
+// export type TipDollars = {
+//     value: Dinero<number>
+// }
 
-// type for Pre Tax Pct Tip
-export type TipTotalDollars = {
-    value: Dinero<number>
-}
+// // type for Pre Tax Pct Tip
+// export type TipTotalDollars = {
+//     value: Dinero<number>
+// }
 
 // data structure for a person
 // export type Person = {
@@ -83,7 +83,9 @@ export type BillData = {
         [key: string]: PersonData
     };
     tax_amt: Dinero<number>;
-    tip_intent: TipPreTaxPct | TipPostTaxPct | TipDollars | TipTotalDollars;
+    tip_type: TipType;
+    tip_pct_requested: number;
+    tip_amt_requested: Dinero<number>;
 }
 
 // TODO Person still has an undefined field. is there a good way to fix that?
