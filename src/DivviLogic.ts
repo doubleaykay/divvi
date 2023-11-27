@@ -9,7 +9,8 @@ import { USD } from '@dinero.js/currencies';
 import type { PersonData, PersonResult, BillData, BillResult } from './DivviTypes';
 import { PayType, TipType } from './DivviTypes';
 
-function pallocate(amount: Dinero<number>, targets: { [key: string]: number }): { [key: string]: Dinero<number> } | undefined {
+// TODO clean up by removing negative case control flow
+function pallocate(amount: Dinero<number>, targets: { [key: string]: number }): { [key: string]: Dinero<number> } {
     // compute total of ratio list
     let ratio_total: number = Object.values(targets).reduce((accumulator: number, currentValue: number): number => {
         return accumulator + currentValue
@@ -45,6 +46,11 @@ function pallocate(amount: Dinero<number>, targets: { [key: string]: number }): 
                 remainder = subtract(remainder, one)
             }
         }
+        if (isZero(remainder)) {
+            return result
+        } else {
+            throw new Error("Pallocate remainder is not zero after spreading the remainder across all targets. Positive case. Something went wrong.");
+        }
     } else if (isNegative(remainder)) {
         // remove one starting at the end of result
         Object.keys(result).reverse().forEach((key) => {
@@ -55,13 +61,13 @@ function pallocate(amount: Dinero<number>, targets: { [key: string]: number }): 
                 remainder = add(remainder, one)
             }
         })
-        return result
+        if (isZero(remainder)) {
+            return result
+        } else {
+            throw new Error("Pallocate remainder is not zero after spreading the remainder across all targets. Negative case. Something went wrong.");
+        }
     } else {
-        // something went wrong: remainder is not zero, positive, or negative
-        // for now, log this to the console and return undefined
-        // TODO handle this case given that the TS compiler is set to strict...
-        console.log('Error: remainder is neither zero, positive, or negative. Something went wrong.')
-        return undefined
+        throw new Error("Pallocate remainder is neither zero, positive, or negative. Something went wrong.");
     }
 }
 
@@ -133,9 +139,10 @@ function computeBill(thisBill: BillData): BillResult {
 
     // 4: determine each person's ideal contribution percentage
     let total_pre_tax_decimal: number = +toDecimal(total_pre_tax)
+    let people: {[key: string]: PersonResult} = {}
 
     for (let person in thisBill.people) {
-        thisBill.people[person].contribution_pct_ideal = +toDecimal(thisBill.people[person].contribution_pre_tax) / total_pre_tax_decimal;
+        people[person].contribution_pct_ideal = +toDecimal(thisBill.people[person].contribution_pre_tax) / total_pre_tax_decimal;
     }
 
     // 5: if everyone is paying exact, use the ideal contribution percent to determine each person's contribution
@@ -149,22 +156,22 @@ function computeBill(thisBill: BillData): BillResult {
     // allocate thisBill.total across everyone. if there are people paying cash, then additional processing is needed
     let allocation_targets: { [key: string]: number } = {}
 
-    for (const key in thisBill.people) {
-        allocation_targets[key] = thisBill.people[key].contribution_pct_ideal
+    for (const key in people) {
+        allocation_targets[key] = people[key].contribution_pct_ideal
     }
 
     let allocated = pallocate(total, allocation_targets)
 
     for (const key in allocated) {
-        thisBill.people[key].contribution_calculated = allocated[key]
+        people[key].contribution_calculated = allocated[key]
     }
 
-    var keys_cash_people: string[] = Object.keys(thisBill.people).reduce(function (filtered, key) {
+    var keys_cash_people: string[] = Object.keys(people).reduce(function (filtered: string[], key: string) {
         if (thisBill.people[key].pay_type == PayType.Cash) filtered.push(key);
         return filtered;
     }, []);
 
-    var keys_exact_people: string[] = Object.keys(thisBill.people).reduce(function (filtered, key) {
+    var keys_exact_people: string[] = Object.keys(people).reduce(function (filtered: string[], key: string) {
         if (thisBill.people[key].pay_type == PayType.Exact) filtered.push(key);
         return filtered;
     }, []);
@@ -212,13 +219,13 @@ function computeBill(thisBill: BillData): BillResult {
 
         // compute the cash people's pre-rounded total
         keys_cash_people.forEach((key) => {
-            pre_rounded_total = add(pre_rounded_total, thisBill.people[key].contribution_calculated)
+            pre_rounded_total = add(pre_rounded_total, people[key].contribution_calculated)
         })
 
         // round everyone who is paying cash and compute their new total
         keys_cash_people.forEach((key) => {
-            thisBill.people[key].contribution_calculated = dround(thisBill.people[key].contribution_calculated)
-            rounded_total = add(rounded_total, thisBill.people[key].contribution_calculated)
+            people[key].contribution_calculated = dround(people[key].contribution_calculated)
+            rounded_total = add(rounded_total, people[key].contribution_calculated)
         })
 
         // compute pre_rounded_total - rounded_total
@@ -236,17 +243,17 @@ function computeBill(thisBill: BillData): BillResult {
             })
             let new_allocated: { [key: string]: Dinero<number> } = pallocate(rounded_diff, new_allocation_targets)
             for (const key in new_allocated) {
-                thisBill.people[key].contribution_calculated = add(thisBill.people[key].contribution_calculated, new_allocated[key])
+                people[key].contribution_calculated = add(people[key].contribution_calculated, new_allocated[key])
             }
         }
         // END ALGO 2
     }
 
     // temp print results to console
-    console.log(toDecimal(thisBill.total))
+    console.log(toDecimal(total))
     for (const key in thisBill.people) {
         console.log(key)
-        console.log(toDecimal(thisBill.people[key].contribution_calculated, ({ value, currency }) => `${currency.code} ${value}`))
+        console.log(toDecimal(people[key].contribution_calculated, ({ value, currency }) => `${currency.code} ${value}`))
     }
 
 
@@ -256,5 +263,13 @@ function computeBill(thisBill: BillData): BillResult {
 
     // console.log(toDecimal(thisBill.total))
 
-    return thisBill
+    // construct return object
+    return {
+        timestamp: Date.now(),
+        people: people,
+        tax_amt: thisBill.tax_amt,
+        tip_amt_computed: tip_amt_computed,
+        total_pre_tax: total_pre_tax,
+        total: total
+    }
 }

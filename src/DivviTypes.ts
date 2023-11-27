@@ -66,7 +66,7 @@ export enum TipType {
 export type PersonData = {
     contribution_pre_tax: Dinero<number>;
     pay_type: PayType;
-    contribution_pct_ideal: number;
+    // contribution_pct_ideal: number;
 }
 
 // Person type for computed result
@@ -91,7 +91,7 @@ export type BillData = {
 // TODO Person still has an undefined field. is there a good way to fix that?
 // TODO do we need to retain tip type information for the results view?
 export type BillResult = {
-    timestamp: string;
+    timestamp: number;
     people: {
         [key: string]: PersonResult
     };
