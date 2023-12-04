@@ -1,8 +1,12 @@
-function PersonComponent() {
+interface PersonIdxProps{
+    index: number
+}
+
+function PersonComponent({index}: PersonIdxProps) {
     return (
       <div>
-        <input name="personName" />
-        <input name="personValue" />
+        <input name={"personName" + index} placeholder={"Person " + index} />
+        <input name={"personValue" + index} placeholder="$0.00"/>
       </div>
     )
   }
