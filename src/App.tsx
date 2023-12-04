@@ -37,8 +37,8 @@ function App() {
         {/* multiple people */}
         <hr />
         People go here...
-        {t.map( (i) => (
-          <PersonComponent index = {i} />
+        {t.map((i) => (
+          <PersonComponent index={i} />
         ))}
         <button type="button">Add person</button>
 
@@ -51,13 +51,15 @@ function App() {
         <hr />
         Tip type:
         <select name="tipType">
-          <option value="someOption">Some option</option>
-          <option value="otherOption">Other option</option>
+          <option value="PreTaxPct">% of subtotal</option>
+          <option value="PostTaxPct">% of subtotal (after tax)</option>
+          <option value="TipDollars">Flat tip amount</option>
+          <option value="TotalDollars">Desired total, including tip</option>
         </select>
         {/* tip value */}
         <br />
         Tip value:
-        <input name="tipValue"/>
+        <input name="tipValue" />
 
         {/* compute button */}
         <hr />
