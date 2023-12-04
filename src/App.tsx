@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { FormEvent } from "react";
 import PersonComponent from './TestComponents';
+import ResultsView from './ResultsView';
 
 function App() {
+
+  const [showResults, setShowResults] = useState(false);
 
   // const [formValues, setFormValues] = useState({});
 
@@ -16,12 +19,16 @@ function App() {
     // prevent refreshing of the entire page on form submit
     e.preventDefault()
 
+    // hide results
+    setShowResults(false)
+
     // get data contained in form as JSON
     const form = e.currentTarget;
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
 
     console.log(formJson);
+    setShowResults(true)
     // console.log("next");
     // console.log(formValues);
 
@@ -68,6 +75,13 @@ function App() {
         {/* results view */}
 
       </form>
+
+      <div id="resultsView">
+        <hr />
+        Results go here...
+        <button onClick={() => setShowResults(!showResults)}>Toggle showing results</button>
+        {showResults ? <ResultsView /> : null}
+      </div>
     </div>
   );
 }
